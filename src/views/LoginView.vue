@@ -122,7 +122,7 @@ export default {
       }).then(res => {
         // 返回用户的所有信息
         // console.log("用户的所有信息为");
-        // console.log(res);
+        console.log(res);
         // 设置信息
         this.$store.state.loginStatus.user_nickname = res.data.user_nickname;
         this.$store.state.loginStatus.user_email = res.data.user_email;
@@ -132,13 +132,14 @@ export default {
         this.$store.state.loginStatus.user_hobby = res.data.user_hobby;
         this.$store.state.loginStatus.user_age = res.data.user_age;
         this.$store.state.loginStatus.user_gender = res.data.user_gender;
-         this.$store.state.loginStatus.all_deal_with = res.data.all_deal_with;
+         this.$store.state.loginStatus.all_deal_amount = res.data.all_deal_amount;
         // console.log("保存的状态为");
         // console.log(this.$store.state.loginStatus);
         // 保存到cookie
         // console.log("保存cookie");
-
-        this.setCookie(res.data.user_nickname,this.ruleForm.username, this.ruleForm.password,res.data.user_email,res.data.user_icon,res.data.user_qq,res.data.user_card,res.data.user_age,res.data.user_hobby,res.data.user_gender,res.data.all_deal_with, 7);
+        this.$store.state.isLogin = false
+        this.$router.push({ name: "Main" })
+        this.setCookie(res.data.user_nickname,this.ruleForm.username, this.ruleForm.password,res.data.user_email,res.data.user_icon,res.data.user_qq,res.data.user_card,res.data.user_age,res.data.user_hobby,res.data.user_gender,res.data.all_deal_amount, 7);
       });
     },
     //设置cookie
@@ -182,7 +183,7 @@ export default {
       window.document.cookie =
         "user_email" + "=" + email + ";path=/;expires=" + exdate.toGMTString();
       window.document.cookie =
-        "all_deal_with" +
+        "all_deal_amount" +
         "=" +
         deal +
         ";path=/;expires=" +

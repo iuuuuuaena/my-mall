@@ -12,7 +12,7 @@
 			<div class="gray-box">
 				<div class="item-box">
           <!-- 遍历小组件，把所有商品显示出来 -->
-					<shop-item-com :key="item.goods_price" v-for="(item) in goodsList" :item="item"></shop-item-com>
+					<shop-item-com :key="item.goods_id" v-for="(item) in goodsList" :item="item"></shop-item-com>
 				</div>
 			</div>
 		</div>

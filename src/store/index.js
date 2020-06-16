@@ -138,10 +138,6 @@ let store = new Vuex.Store({
   mutations: {
     // 加到购物车的数据
     addCarPanelData(state, data) {
-      if (state.isLogin == false) {
-        // state.isLogin == false
-        return
-      }
       let bOff = true
       state.carPanelData.forEach((goods) => {
         if (goods.goods_id === data[0].goods_id) {

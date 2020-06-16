@@ -3,56 +3,49 @@
   <div class="publish-goods">
     <!-- 表单 -->
     <div class="publish-center">
-      <el-form :model="PublishedGoodsData" :rules="rules">
+      <el-form :model="goodsData" :rules="rules">
         <!-- 表单项 -->
-        <el-form-item label="商品名" prop="goods_name">
-          <el-input v-model="PublishedGoodsData.goods_name"></el-input>
+        <el-form-item label="商品名" prop="good_name">
+          <el-input v-model="goodsData.goods_name"></el-input>
         </el-form-item>
         <!-- 表单项 -->
         <el-form-item label="商品信息" prop="goods_info">
           <el-input
             type="textarea"
-            v-model="PublishedGoodsData.goods_info"
+            v-model="goodsData.goods_info"
             :autosize="{ minRows: 2, maxRows: 4}"
             placeholder="请输入商品具体描述"
           ></el-input>
         </el-form-item>
         <el-form-item label="商品照片上传">
-          <el-upload
-            action="http://121.89.208.41:8080/mUpload/"
-            list-type="picture-card"
-            :on-preview="handlePictureCardPreview"
-            :on-remove="handleRemove"
-          >
-            <i class="el-icon-plus"></i>
-          </el-upload>
-          <el-dialog :visible.sync="dialogVisible">
+          <img id="icon" v-if="isShow" :src="'http://121.89.208.41:8080'+goodsData.goods_image" />
+          <input name="file" form="form2" type="file" class="form-control" />
+          <input
+            class="btn btn-sm btn-success"
+            form="form2"
+            id="fileBtn"
+            value="上传"
+            type="button"
+            @click="uploadImg()"
+          />
+          <!-- <i v-else class="el-icon-plus avatar-uploader-icon"></i> -->
+          <!-- </el-upload>
+                </el-form-item>
+              </el-form>
+          -->
+          <form id="form2" method="post" enctype="multipart/form-data"></form>
+          <!-- <el-dialog :visible.sync="dialogVisible">
             <img width="100%" :src="dialogImageUrl" alt />
-          </el-dialog>
+          </el-dialog>-->
         </el-form-item>
         <!-- 表单项 -->
         <el-form-item label="商品价格">
-          <el-input
-            label-width="100px"
-            v-model="PublishedGoodsData.goods_name"
-            placeholder="请输入商品价格"
-          ></el-input>
+          <el-input label-width="100px" v-model="goodsData.goods_price" placeholder="请输入商品价格"></el-input>
         </el-form-item>
 
         <!-- 表单项 -->
         <el-form-item label="商品标签">
-          <el-select v-model="PublishedGoodsData.goods_tag" placeholder="商品标签">
-            <el-option label="电子数码" value="电子数码"></el-option>
-            <el-option label="服装首饰" value="服装首饰"></el-option>
-            <el-option label="电子数码" value="电子数码"></el-option>
-            <el-option label="服装首饰" value="服装首饰"></el-option>
-            <el-option label="电子数码" value="电子数码"></el-option>
-            <el-option label="服装首饰" value="服装首饰"></el-option>
-            <el-option label="电子数码" value="电子数码"></el-option>
-            <el-option label="服装首饰" value="服装首饰"></el-option>
-            <el-option label="电子数码" value="电子数码"></el-option>
-            <el-option label="服装首饰" value="服装首饰"></el-option>
-          </el-select>
+          <el-input v-model="goodsData.goods_tag" placeholder="商品标签"></el-input>
         </el-form-item>
         <!-- 表单项 -->
         <el-form-item>
@@ -64,6 +57,8 @@
 </template>
 
 <script>
+import $ from "jquery";
+
 import FileUploadCom from "@/components/FileUploadCom";
 export default {
   data() {
@@ -75,17 +70,18 @@ export default {
       }
     };
     return {
+      // 是否显示图片
+      isShow: false,
       // 商品的数据
-      PublishedGoodsData: {
-        user_nickname: "1231",
+      goodsData: {
+        user_nickname: "",
         user_account: "",
-        goods_id: 0,
         goods_name: "",
         goods_price: 0,
         goods_image: "",
         goods_info: "",
         goods_tag: "",
-        id_deal: 1
+        id_deal: 0
       },
       rules: {
         goods_name: [
@@ -101,22 +97,90 @@ export default {
     };
   },
   methods: {
-    // 发布商品
-    publishGoods() {},
+    
     onSubmit() {
-      console.log(this.PublishedGoodsData);
+      console.log(this.goodsData);
+      this.$axios({
+        url: "/api/publishGood",
+        methods: "get",
+        params: this.goodsData
+      }).then(res => {
+        if (res.data.code == 606) {
+          this.$message.success("商品上传成功");
+        }else{
+           this.$message.error("商品上传失败");
+        }
+      });
     },
-    // 文件上传
-    handleRemove(file, fileList) {
-      console.log(file, fileList);
+    uploadImg() {
+      var formData = new FormData($("#form2")[0]);
+      var newImagePath = "";
+      var x = false;
+      $.ajax({
+        async: false,
+        cache: false,
+        type: "post",
+        data: formData,
+        url: "/api/dUpload",
+        dataType: "json",
+        contentType: false, //必须
+        processData: false, //必须
+        success: function(data) {
+          // console.log("上传文件成功:" + data);
+          // console.log(data);
+
+          // $("#icon").attr(
+          //   "src",
+          //   "http://121.89.208.41:8080/asserts" + data.path
+          // );
+          if (data.path != null) {
+            newImagePath = "/asserts" + data.path;
+            x = true;
+          }
+          // $("#icon").attr("value", "http://121.89.208.41:8080" + data.path);
+          // alert("success: " + data);
+        },
+        error: function(arg1, arg2, arg3) {
+          // console.log(arg1 + "--" + arg2 + "--" + arg3);
+
+          x = false;
+        }
+      });
+      if (x == true) {
+        this.isShow = true;
+        this.$message.success("图片上传成功");
+      } else {
+        this.$message.error("图片上传错误，请联系管理员");
+      }
+      this.goodsData.goods_image = newImagePath;
+
+      // this.changeImage(newImagePath);
     },
-    handlePictureCardPreview(file) {
-      this.dialogImageUrl = file.url;
-      this.dialogVisible = true;
+    getCookie() {
+      //读取cookie
+      //读取cookie
+      // console.log("获取cookie");
+      if (document.cookie.length > 0) {
+        var arr = document.cookie.split("; "); //这里显示的格式需要切割一下自己可输出看下
+        // console.log(arr);
+        for (var i = 0; i < arr.length; i++) {
+          var arr2 = arr[i].split("="); //再次切割
+          if (arr2[0] == "user_nickname") {
+            // console.log(arr2[1]);
+            this.goodsData.user_nickname = arr2[1];
+          } else if (arr2[0] == "user_account") {
+            // console.log(arr2[1]);
+            this.goodsData.user_account = arr2[1];
+          }
+        }
+      }
     }
   },
   components: {
     FileUploadCom
+  },
+  mounted() {
+    this.getCookie();
   }
 };
 </script>

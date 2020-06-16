@@ -4,7 +4,7 @@
       <div class="col-md-6 person-info-agileits-w3layouts">
         <h3 class="w3_head w3_head1">
           个人信息
-          <span>I am Andrew Smith</span>
+          <span>总交易金额:{{userInfo.all_deal_amount}}</span>
         </h3>
         <el-form ref="form" :model="userInfo" label-width="80px">
           <el-form-item label="你的昵称">
@@ -35,9 +35,14 @@
           <el-form-item label="银行卡">
             <el-input v-model="userInfo.user_card"></el-input>
           </el-form-item>
+
+          <el-form-item label="交易金额">
+            <el-input v-model="userInfo.all_deal_amount"></el-input>
+          </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="onChange">更新信息</el-button>
           </el-form-item>
+          
         </el-form>
       </div>
       <div class="clearfix"></div>
@@ -52,13 +57,14 @@ export default {
       userInfo: {
         user_nickname: "",
         user_account: "",
-        user_password: "",
-        user_qq: 0,
+        user_password:"",
         user_age: 0,
-        user_gender: 0,
+        user_gender:0,
+        user_hobby:"",
+        user_qq: 0,
         user_email: "",
         user_card: 0,
-        user_hobby: ""
+        all_deal_amount:0,
       }
     };
   },
@@ -69,10 +75,10 @@ export default {
         methods: "get",
         params: this.userInfo
       }).then(res => {
-        // console.log(res);
-        if (res.data.code == 1016) {
+        console.log(res);
+        if (res.data.code == 1015) {
           this.$message.success("更新信息成功!");
-        } else if (res.data.code == 1015) {
+        } else if (res.data.code == 1016) {
           this.$message.error("更新信息失败!");
         }else{
            this.$message.error("其他未知错误!");
@@ -107,8 +113,8 @@ export default {
             this.userInfo.user_email = arr2[1];
           } else if (arr2[0] == "user_card") {
             this.userInfo.user_card = arr2[1];
-          } else if (arr2[0] == "all_deal_with") {
-            this.userInfo.all_deal_with = arr2[1];
+          } else if (arr2[0] == "all_deal_amount") {
+            this.userInfo.all_deal_amount= arr2[1];
           } else if (arr2[0] == "user_icon") {
             this.userInfo.user_icon = arr2[1];
           } else if (arr2[0] == "user_hobby") {
@@ -116,6 +122,21 @@ export default {
           }
         }
       }
+    },
+    // 获取该账号用户的所有交易金额
+    getAllCount(){
+      this.$axios({
+        url:"/api/calculte",
+        methods:"get",
+        params:{
+          user_account: this.userInfo.user_account
+        }
+      }).then(res=>{
+        // if(res.data.)
+        console.log(res);
+        
+        this.userInfo.all_deal_amount = res.data.data
+      })
     }
   },
   created() {
@@ -129,6 +150,7 @@ export default {
   },
   mounted() {
     this.getCookie();
+    this.getAllCount();
   }
 };
 </script>

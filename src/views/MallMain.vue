@@ -65,7 +65,7 @@ export default {
         url: "/api/getAllImage",
         methods: "get"
       }).then(res => {
-        console.log(res);
+        // console.log(res);
         if (res.status == 200) {
           this.$store.state.myImage = res.data
         }
